@@ -1,0 +1,83 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hospital Visit Pro</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial;background:#f1f5f9;color:#172554}
+header{background:#123b70;color:white;padding:20px}
+main{max-width:850px;margin:20px auto;padding:15px}
+.card{background:white;padding:20px;border-radius:12px;margin-bottom:16px;box-shadow:0 2px 8px #0001}
+h1{margin:0;font-size:24px}
+h2{font-size:19px}
+input,select,textarea,button{width:100%;padding:12px;margin:7px 0;border:1px solid #ccd5e0;border-radius:7px;font-size:15px}
+button{background:#1764bd;color:white;border:0;font-weight:bold}
+.stats{display:flex;gap:10px;flex-wrap:wrap}
+.stat{flex:1;min-width:100px;background:#e5efff;padding:15px;border-radius:8px}
+#records{overflow-wrap:anywhere}
+.small{color:#64748b;font-size:13px}
+</style>
+</head>
+<body>
+<header>
+<h1>Hospital Visit Pro</h1>
+<p>Hospital Visit & Medical Equipment Management</p>
+</header>
+<main>
+<div class="stats">
+<div class="stat">Total Visits<h2 id="total">0</h2></div>
+<div class="stat">Follow-ups<h2 id="follow">0</h2></div>
+</div>
+<div class="card">
+<h2>Add Hospital Visit</h2>
+<form id="visitForm">
+<input id="hospital" placeholder="Hospital Name" required>
+<input id="doctor" placeholder="Doctor Name">
+<input id="phone" placeholder="Contact Number">
+<input id="city" placeholder="City">
+<select id="machine">
+<option value="">Select Machine Requirement</option>
+<option>Digital X-Ray</option><option>CR</option><option>DR</option>
+<option>C-Arm</option><option>Ultrasound</option>
+<option>Color Doppler</option><option>Portable X-Ray</option>
+<option>Mammography</option><option>CT</option><option>MRI</option><option>Other</option>
+</select>
+<input id="date" type="date">
+<input id="next" type="date" placeholder="Follow-up Date">
+<select id="status">
+<option>New Lead</option><option>Follow-up</option>
+<option>Interested</option><option>Not Interested</option><option>Order</option>
+</select>
+<textarea id="notes" placeholder="Visit Notes"></textarea>
+<button type="submit">Save Visit</button>
+</form>
+</div>
+<div class="card">
+<h2>Saved Visits</h2>
+<div id="records">No visits added yet.</div>
+</div>
+<p class="small">Demo version: records are saved only in this browser. Database and secure user login will be connected in the next setup step.</p>
+</main>
+<script>
+let visits=JSON.parse(localStorage.getItem("hospitalVisits")||"[]");
+function render(){
+document.getElementById("total").textContent=visits.length;
+document.getElementById("follow").textContent=visits.filter(v=>v.status==="Follow-up").length;
+document.getElementById("records").innerHTML=visits.length?visits.map(v=>`<div class="card"><b>${escapeText(v.hospital)}</b><p>Doctor: ${escapeText(v.doctor)} | Phone: ${escapeText(v.phone)}</p><p>City: ${escapeText(v.city)} | Machine: ${escapeText(v.machine)}</p><p>Status: ${escapeText(v.status)} | Follow-up: ${escapeText(v.next)}</p><p>${escapeText(v.notes)}</p></div>`).join(""):"No visits added yet.";
+}
+function escapeText(s){return String(s||"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+document.getElementById("visitForm").addEventListener("submit",e=>{
+e.preventDefault();
+let v={};
+["hospital","doctor","phone","city","machine","date","next","status","notes"].forEach(k=>v[k]=document.getElementById(k).value);
+visits.unshift(v);
+localStorage.setItem("hospitalVisits",JSON.stringify(visits));
+e.target.reset();render();alert("Visit saved!");
+});
+render();
+</script>
+</body>
+</html>
